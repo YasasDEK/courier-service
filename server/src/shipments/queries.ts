@@ -12,6 +12,11 @@ const updateShipmentById =
 
 const getShipmentByUser = "SELECT * FROM shipments WHERE uid = $1";
 
+const updateShipmentStatus = "UPDATE shipments SET status = $1 WHERE id = $2";
+
+const getShipmentByTrackingNumber =
+  "SELECT * FROM shipments WHERE tracknumber = $1";
+
 export const shipmentQuery = {
   getShipments,
   getShipmentById,
@@ -19,4 +24,6 @@ export const shipmentQuery = {
   deleteUSer,
   updateShipmentById,
   getShipmentByUser,
+  updateShipmentStatus,
+  getShipmentByTrackingNumber,
 };

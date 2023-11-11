@@ -44,8 +44,6 @@ const getUserById = (req, res) => {
 const getUserByEmail = (req, res) => {
   const email = req.params.email;
 
-  console.log(email);
-
   pool.query(userQuery.getUserByEmail, [email], (error, results) => {
     if (error) {
       return getInternalServerError(error);
@@ -170,6 +168,32 @@ const loginUser = (req, res) => {
   );
 };
 
+const updateUserType = (req, res) => {
+  const id = parseInt(req.params.id);
+  const { type } = req.body;
+
+  pool.query(userQuery.getUserById, [id], (error, results) => {
+    if (error) {
+      return getInternalServerError(error);
+    }
+
+    if (!results.rows.length) {
+      return getUserNotFoundError(res);
+    }
+
+    pool.query(userQuery.updateUserType, [type, id], (error) => {
+      if (error) {
+        return getInternalServerError(error);
+      }
+
+      return res.status(200).json({
+        code: 200,
+        message: "User type updated successfully",
+      });
+    });
+  });
+};
+
 export const userController = {
   getUsers,
   getUserById,
@@ -178,4 +202,5 @@ export const userController = {
   updateUser,
   loginUser,
   getUserByEmail,
+  updateUserType,
 };

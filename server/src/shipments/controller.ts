@@ -27,7 +27,6 @@ const getShipments = (req, res) => {
 
 const getShipmentById = (req, res) => {
   const id = parseInt(req.params.id);
-  console.log(id);
 
   pool.query(shipmentQuery.getShipmentById, [id], (error, results) => {
     if (error) {
@@ -68,7 +67,7 @@ const addShipment = (req, res) => {
       itemCount,
       status,
     ],
-    (error, results) => {
+    (error) => {
       if (error) {
         return getInternalServerError(error);
       }
@@ -123,7 +122,7 @@ const updateShipment = (req, res) => {
     pool.query(
       shipmentQuery.updateShipmentById,
       [recipientName, recipientAddress, , itemCode, itemCount, , status, id],
-      (error, results) => {
+      (error) => {
         if (error) {
           return getInternalServerError(error);
         }
@@ -145,8 +144,58 @@ const getShipmentsByUser = (req, res) => {
       return getInternalServerError(error);
     }
 
+    if (!results.rows.length) {
+      return getShipmentNotFoundError(res);
+    }
+
     return res.status(200).json(results.rows);
   });
+};
+
+const updateShipmentStatus = (req, res) => {
+  const id = parseInt(req.params.id);
+  const { status } = req.body;
+
+  pool.query(shipmentQuery.getShipmentById, [id], (error, results) => {
+    if (error) {
+      return getInternalServerError(error);
+    }
+
+    if (!results.rows.length) {
+      return getShipmentNotFoundError(res);
+    }
+
+    pool.query(shipmentQuery.updateShipmentStatus, [status, id], (error) => {
+      if (error) {
+        return getInternalServerError(error);
+      }
+
+      return res.status(200).json({
+        code: 200,
+        message: "Shipment status updated successfully",
+      });
+    });
+  });
+};
+
+const getShipmentFromTrackingNumber = (req, res) => {
+  const trackingNumber = req.params.trackingNumber;
+
+  pool.query(
+    shipmentQuery.getShipmentByTrackingNumber,
+    [trackingNumber],
+    (error, results) => {
+      if (error) {
+        return getInternalServerError(error);
+      }
+
+      if (!results.rows.length) {
+        return getShipmentNotFoundError(res);
+      }
+
+      return res.status(200).json(results.rows[0]);
+    }
+  );
 };
 
 export const shipmentController = {
@@ -156,4 +205,6 @@ export const shipmentController = {
   deleteShipment,
   updateShipment,
   getShipmentsByUser,
+  updateShipmentStatus,
+  getShipmentFromTrackingNumber,
 };

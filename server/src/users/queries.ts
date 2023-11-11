@@ -19,6 +19,8 @@ const updateUserById =
 const checkLoginExisists =
   "SELECT * FROM users WHERE email = $1 AND password = $2";
 
+const updateUserType = "UPDATE users SET type = $1 WHERE id = $2";
+
 export const userQuery = {
   getUsers,
   getUserById,
@@ -28,4 +30,5 @@ export const userQuery = {
   updateUserById,
   getUserByEmail,
   checkLoginExisists,
+  updateUserType,
 };
