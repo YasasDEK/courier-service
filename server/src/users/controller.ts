@@ -76,9 +76,23 @@ const addUser = (req, res) => {
           return getInternalServerError(error);
         }
 
-        return res.status(201).json({
-          code: 201,
-          message: "User added successfully",
+        pool.query(userQuery.getUserByEmail, [email], (error, results) => {
+          if (error) {
+            return getInternalServerError(error);
+          }
+
+          if (!results.rows.length) {
+            return getUserNotFoundError(res);
+          }
+
+          return res.status(201).json({
+            code: 201,
+            data: {
+              id: results.rows[0].id,
+              type: results.rows[0].type,
+            },
+            message: "User added successfully",
+          });
         });
       }
     );
